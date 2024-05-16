@@ -42,7 +42,9 @@ cls
 echo.
 call :ColorText 6f "======================================================================================================"
 echo.
-call :ColorText 6f "This Script will ask for Admin Priviledges and a LAN connection via Docking Station is neccessary    I"
+call :ColorText 6f "This Script will ask for Admin Priviledges and a internet connection is neccessary                    I"
+echo.
+call :ColorText 6f "Attention on the American Keyboard layout "y" is "z"!                                                 I"
 echo.
 call :ColorText 6f "======================================================================================================"
 echo.
@@ -52,7 +54,6 @@ goto eof
 
 :ask2
 cls
-echo.
 echo.
 call :ColorText 6f "======================================================================================================"
 echo.
@@ -88,7 +89,7 @@ if %errorlevel% equ 0 (
 
 :check2
 cls
-call :ColorText 0a "Checking if helper Script exists..."
+call :ColorText 0a "Checking if Helper Script exists..."
 timeout /t 2 >NUL
 cls
 IF EXIST "helper_autopilotidextractor.ps1" (
@@ -108,7 +109,7 @@ IF EXIST "helper_autopilotidextractor.ps1" (
 
 :check3
 cls
-call :ColorText 0a "Checking if the folder-names are correct..."
+call :ColorText 0a "Checking if the Folder-Names are correct..."
 timeout /t 2 >NUL
 cls
 echo.
@@ -116,7 +117,6 @@ set "expectedPath=%~d0\Autopilot-Script\%~nx0"
 if "%expectedPath%"=="%~f0" (
  goto execution
 ) ELSE (
-   echo.
    echo.
    call :ColorText 4f "======================================================================================================"
    echo.
@@ -136,9 +136,12 @@ timeout /t 2 >NUL
 cls
 echo.
 cd /d %~dp0
-rmdir /s /q HWID>NUL
+rem remove old HWID folder
+rmdir /s /q HWID >nul 2>&1
+rem execute command
 PowerShell.exe -Command "Start-Process PowerShell -Verb RunAs -ArgumentList '-NoProfile -ExecutionPolicy Bypass -File \"%~dp0helper_autopilotidextractor.ps1\"'
-cd /d "C:\ProgramData"
+rem Change directory to userprofile and save drive letter to temp file.
+cd /d "%USERPROFILE%"
 SET drive_path=%~dp0
 echo %drive_path:~0,2% > drive_path.txt
 

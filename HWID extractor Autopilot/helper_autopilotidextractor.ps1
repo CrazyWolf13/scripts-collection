@@ -1,5 +1,7 @@
+Write-Output "Answer Y to all prompts, attention on American keyboard layout!"
+
 # Set Path for drive-letter text file
-$filePath = "C:\ProgramData\drive_path.txt"
+$filePath = "$env:userprofile\drive_path.txt"
 
 # Read the Drive-Letter from the File:
 $driveLetter = Get-Content -Path $filePath 
@@ -10,7 +12,7 @@ $driveLetter = $driveLetter.TrimEnd($driveLetter[-1])
 $usbDrivePath = "$driveLetter\Autopilot-Script\"
 
 # Change directory to the USB drive
-Set-Location -Path $usbDrivePath
+Set-Location -Path $usbDrivePath  > $null
 
 # Create a directory named HWID in the USB drive
 New-Item -ItemType Directory -Path (Join-Path $usbDrivePath "HWID")
