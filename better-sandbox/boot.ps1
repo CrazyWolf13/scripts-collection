@@ -1,9 +1,9 @@
 # Define URLs and output file names
 $urls = @{
-    "https://aka.ms/getwinget" = "Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle"
     "https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx" = "Microsoft.VCLibs.x64.14.00.Desktop.appx"
     "https://github.com/microsoft/microsoft-ui-xaml/releases/download/v2.8.6/Microsoft.UI.Xaml.2.8.x64.appx" = "Microsoft.UI.Xaml.2.8.x64.appx"
     "https://github.com/microsoft/terminal/releases/download/v1.20.11381.0/Microsoft.WindowsTerminal_1.20.11381.0_8wekyb3d8bbwe.msixbundle" = "Microsoft.WindowsTerminal_1.20.11381.0_8wekyb3d8bbwe.msixbundle"
+    "https://aka.ms/getwinget" = "Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle"
 }
 
 # Create a list to hold the download tasks
@@ -40,5 +40,4 @@ Write-Host "Install the Packages"
 foreach ($file in $urls.Values) {
     Add-AppxPackage $file
 }
-Add-AppxPackage Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle
 wt.exe
