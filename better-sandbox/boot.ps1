@@ -79,4 +79,6 @@ foreach ($file in $packagePaths[$architecture]) {
 }
 
 Write-Host "Downloads and installation completed successfully."
-wt.exe -p "Windows Terminal"
+Start-Process powershell -ArgumentList "winget source remove msstore" -Wait
+Start-Process powershell -ArgumentList "winget install Microsoft.WindowsTerminal" -Wait
+Start-Process powershell -ArgumentList "wt.exe -p Windows Terminal"
