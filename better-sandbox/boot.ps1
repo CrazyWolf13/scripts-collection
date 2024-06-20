@@ -1,4 +1,6 @@
 $architecture = $Env:PROCESSOR_ARCHITECTURE
+$wt_filename = "Microsoft.WindowsTerminal_1.20.11381.0_arm64.zip"
+$wt_version = "1.20.11381.0"
 
 if ($architecture -eq "AMD64") {
     Write-Host "Architecture: x64 (AMD64)"
@@ -7,6 +9,28 @@ if ($architecture -eq "AMD64") {
 } else {
     Write-Host "Unknown architecture: $architecture"
 }
+
+
+# Background Tasks to be run after the installation
+$backgroundCommands = @(
+    "winget source remove msstore",
+    "winget install Microsoft.Powershell --accept-package-agreements --accept-source-agreements",
+    "winget install git.git --accept-package-agreements --accept-source-agreements"
+)
+$backgroundScriptBlock = [scriptblock]::Create(($backgroundCommands -join "; "))
+
+
+# Custom Commands to be executed after finishing the installation
+$commands = @{
+    "AMD64" = @(
+        "wt.exe -p 'Windows Terminal'"
+    )
+    "ARM64" = @(
+        "wt.exe -p 'Windows Terminal'"
+    )
+}
+$scriptBlock = [scriptblock]::Create(($commands[$architecture] -join "; "))
+
 
 # List of URLs with a secondary property for filename
 $urls = @{
@@ -19,10 +43,11 @@ $urls = @{
     "ARM64" = @(
         @{ Url = "https://aka.ms/Microsoft.VCLibs.arm64.14.00.Desktop.appx"; FileName = "Microsoft.VCLibs.arm64.14.00.Desktop.appx" },
         @{ Url = "https://globalcdn.nuget.org/packages/microsoft.ui.xaml.2.8.6.nupkg"; FileName = "microsoft.ui.xaml.2.8.6.zip" },
-        @{ Url = "https://github.com/microsoft/terminal/releases/download/v1.20.11381.0/Microsoft.WindowsTerminal_1.20.11381.0_8wekyb3d8bbwe.msixbundle"; FileName = "Microsoft.WindowsTerminal_1.20.11381.0_8wekyb3d8bbwe.msixbundle" },
+        @{ Url = "https://github.com/microsoft/terminal/releases/download/v$wt_version/$wt_filename"; FileName = "$wt_filename" },
         @{ Url = "https://aka.ms/getwinget"; FileName = "Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle" }
     )
 }
+
 
 # List of file paths to the downloaded package files
 $packagePaths = @{
@@ -35,15 +60,13 @@ $packagePaths = @{
     "ARM64" = @(
         "Microsoft.VCLibs.arm64.14.00.Desktop.appx",
         "microsoft.ui.xaml.2.8.6\tools\AppX\arm64\Release\Microsoft.UI.Xaml.2.8.appx",
-        "Microsoft.WindowsTerminal_1.20.11381.0_8wekyb3d8bbwe.msixbundle",
         "Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle"
     )
 }
 
-# Create a list to hold the download tasks
-$downloadTasks = @()
 
-# Load the WebClient type
+# Initialize the download tasks
+$downloadTasks = @()
 Add-Type @"
 using System;
 using System.Net;
@@ -70,8 +93,22 @@ foreach ($url in $urls[$architecture]) {
 Write-Host "Waiting for completion..."
 [System.Threading.Tasks.Task]::WaitAll($downloadTasks)
 
-# Expand UI.XAML package
-Expand-Archive -Path "microsoft.ui.xaml.2.8.6.zip" -DestinationPath "microsoft.ui.xaml.2.8.6"
+# Custom installer commands based on architecture
+if ($architecture -eq "ARM64") {
+    Write-Host "Executing ARM64 specific commands"
+    Expand-Archive -Path "microsoft.ui.xaml.2.8.6.zip" -DestinationPath "microsoft.ui.xaml.2.8.6"
+    # Windows Terminal manuell installieren.
+    # DestinationPath is filename without the extension
+    Expand-Archive -Path "$wt_filename" -DestinationPath "$($wt_filename.Substring(0, $wt_filename.Length - 4))"
+    $wt_destinationPath = "${env:ProgramFiles}\WindowsTerminal"
+    Move-Item -Path "$($wt_filename.Substring(0, $wt_filename.Length - 4))\terminal-$wt_version" -Destination $wt_destinationPath
+    # Add WT to PATH
+    $env:Path += ";$wt_destinationPath"
+    [System.Environment]::SetEnvironmentVariable("Path", $env:Path, [System.EnvironmentVariableTarget]::Machine)
+    Write-Host "Windows Terminal installed to $wt_destinationPath"
+} elseif ($architecture -eq "AMD64") {
+    Write-Host "Executing AMD64 specific commands"
+}
 
 Write-Host "Install the Packages"
 foreach ($file in $packagePaths[$architecture]) {
@@ -79,6 +116,12 @@ foreach ($file in $packagePaths[$architecture]) {
 }
 
 Write-Host "Downloads and installation completed successfully."
-Start-Process powershell -ArgumentList "winget source remove msstore" -Wait
-Start-Process powershell -ArgumentList "winget install Microsoft.WindowsTerminal" -Wait
-Start-Process powershell -ArgumentList "wt.exe -p Windows Terminal"
+
+# Post-Installation commands
+# Execute the custom commands per architecture
+Start-Process powershell -ArgumentList "-Command $scriptBlock" -Wait
+
+# Run the following commands in the background and exit the main script
+Start-Process powershell -ArgumentList "-Command $backgroundScriptBlock" -NoNewWindow -WindowStyle Hidden -NoWait
+
+#TODO: Add Taskbar Pinning
