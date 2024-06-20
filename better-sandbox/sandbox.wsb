@@ -1,12 +1,12 @@
 <Configuration>
 	<MappedFolders>
 		<MappedFolder>
-			<HostFolder>C:\Users\tobia\Pictures\Batchs\Custom_Apllications_Tobias\Custom-Sandbox</HostFolder>
+			<HostFolder>C:\Users\tobia\Pictures\Batchs\Custom_Apllications_Tobias\Custom-Sandbox\better-sandbox</HostFolder>
 			<SandboxFolder>c:\software</SandboxFolder>
 		</MappedFolder>
 		<MappedFolder>
 			<HostFolder>C:\Users\tobia\Downloads</HostFolder>
-			<SandboxFolder>C:\Users\WDAGUtilityAccount\Downloads</SandboxFolder>
+			<SandboxFolder>C:\Users\WDAGUtilityAccount\Documents</SandboxFolder>
 			<ReadOnly>true</ReadOnly>
 		</MappedFolder>
 	</MappedFolders>

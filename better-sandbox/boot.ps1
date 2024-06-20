@@ -122,6 +122,5 @@ Write-Host "Downloads and installation completed successfully."
 Start-Process powershell -ArgumentList "-Command $scriptBlock" -Wait
 
 # Run the following commands in the background and exit the main script
-Start-Process powershell -ArgumentList "-Command $backgroundScriptBlock" -NoNewWindow -WindowStyle Hidden -NoWait
-
-#TODO: Add Taskbar Pinning
+Start-Process -FilePath "powershell.exe" -ArgumentList "-Command $backgroundScriptBlock" -WindowStyle Hidden
+[Environment]::Exit(1)
