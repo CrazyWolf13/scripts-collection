@@ -71,7 +71,6 @@ Write-Host "Waiting for completion..."
 [System.Threading.Tasks.Task]::WaitAll($downloadTasks)
 
 # Expand UI.XAML package
-Rename-Item -Path "microsoft.ui.xaml.2.8.6.nupkg" -NewName "microsoft.ui.xaml.2.8.6.zip"
 Expand-Archive -Path "microsoft.ui.xaml.2.8.6.zip" -DestinationPath "microsoft.ui.xaml.2.8.6"
 
 Write-Host "Install the Packages"
